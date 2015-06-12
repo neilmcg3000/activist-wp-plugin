@@ -1,35 +1,25 @@
 <?php
 /**
- * Plugin Name: Name of the plugin, must be unique.
- * Plugin URI: http://URI_Of_Page_Describing_Plugin_and_Updates
- * Description: A brief description of the plugin.
- * Version: The plugin's version number. Example: 1.0.0
- * Author: Name of the plugin author
- * Author URI: http://URI_Of_The_Plugin_Author
- * Text Domain: Optional. Plugin's text domain for localization. Example: mytextdomain
- * Domain Path: Optional. Plugin's relative directory path to .mo files. Example: /locale/
- * Network: Optional. Whether the plugin can only be activated network wide. Example: true
- * License: A short license name. Example: GPL2
+ * Plugin Name: Activist.js
+ * Plugin URI: https://activistjs.com/
+ * Description: Activate your users against network disruptions
+ * Version: 0.1.0
+ * Author: Will Scott
+ * Author URI: https://wills.co.tt
+ * Network: false
+ * License: Apache 2.0
  */
 
 include('includes/functions.php');
 
-
-add_filter('language_attributes', 'avst_lang_add');
-add_filter('mod_rewrite_rules', 'avst_rule_add');
-
-
-add_action( 'publish_post', 'avst_post_published');
-add_action( 'update_post', 'avst_post_published');
+add_filter('language_attributes', 'activist_lang_add');
+add_filter('mod_rewrite_rules', 'activist_rule_add');
 
 
-add_action( 'wp_enqueue_scripts', 'avst_add_script' );
+add_action('publish_post', 'activist_regen_manifest');
+add_action('update_post', 'activist_regen_manifest');
 
-
-
-
-
-
+add_action('wp_enqueue_scripts', 'activist_include');
 
 
 ?>
