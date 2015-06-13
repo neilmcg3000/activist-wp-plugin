@@ -9,7 +9,7 @@
  * Network: false
  * License: Apache 2.0
  */
-
+defined('ABSPATH') or die('');
 include('includes/functions.php');
 
 add_filter('language_attributes', 'activist_lang_add');
