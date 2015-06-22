@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 $manifest = "CACHE MANIFEST
 # %s
@@ -6,15 +6,11 @@ $manifest = "CACHE MANIFEST
 CACHE:
 %s
 
-
 #FALLBACK:
 #/ fallback.html
 
 NETWORK:
 *
-
-
 ";
-
 
 ?>
