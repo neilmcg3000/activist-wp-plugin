@@ -7,7 +7,7 @@
 
 class Activist_Updates {
   const HOST = 'github.com';
-  const CHECK_INTERVAL = 86400 * 7; // 7 days in seconds.
+  const CHECK_INTERVAL = 604800; // 7 days in seconds.
 
   private static $last_version = '';
   private static $initialized = false;

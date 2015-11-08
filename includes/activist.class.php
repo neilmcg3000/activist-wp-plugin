@@ -32,8 +32,8 @@ class Activist {
     add_action('publish_post', array('Activist', 'regen_manifest'));
     add_action('update_post', array('Activist', 'regen_manifest'));
 
-    self::$cache_mode = apply_filters('activist_cache_mode', get_option('activist_cache_mode'));
-    self::$auto_update = apply_filters('activist_auto_update', get_option('activist_auto_update'));
+    self::$cache_mode = apply_filters('activist_cache_mode', get_option('activist_cache_mode', 1));
+    self::$auto_update = apply_filters('activist_auto_update', get_option('activist_auto_update', 1));
 
     // Normal pages are only added in primary cache mode.
     if (self::$cache_mode == self::$CACHE_MODES['All Posts']) {
@@ -45,16 +45,16 @@ class Activist {
     }
   }
 
-  private static function html_tag($output) {
+  public static function html_tag($output) {
       $output .= ' manifest="' . self::MANIFEST_NAME . '"';
       return $output;
   }
 
-  private static function mime_type($rules) {
+  public static function mime_type($rules) {
       return $rules . "AddType text/cache-manifest .manifest \n";
   }
 
-  private static function include_script() {
+  public static function include_script() {
     wp_enqueue_script('activist', ACTIVIST__PLUGIN_DIR . 'activist.js', array(), null);
   }
 
@@ -65,7 +65,7 @@ class Activist {
     return in_array($type, types);
   }
 
-  private static function regen_manifest() {
+  public static function regen_manifest() {
     // collect files to cache
     $files_to_cache = array();
     $files_to_cache[] = Activist::toUrl(ACTIVIST__PLUGIN_DIR . 'activist.js');

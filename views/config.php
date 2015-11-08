@@ -20,8 +20,8 @@
           					<td></td>
                   	<td align="left">
                       <fieldset><legend class="screen-reader-text"><span><?php esc_html_e('Activist Cache Mode', 'activist'); ?></span></legend>
-                      <p><label for="activist_mode_1"><input type="radio" name="activist_cache_mode" id="activist_mode_1" value="1" <?php checked('1', get_option('activist_cache_mode')); ?> /> <?php esc_html_e('Make all pages available offline.', 'activist'); ?></label></p>
-                      <p><label for="activist_mode_2"><input type="radio" name="activist_cache_mode" id="activist_mode_2" value="2" <?php checked('2', get_option('activist_cache_mode')); ?> /> <?php esc_html_e('Make no pages available offline.', 'activist'); ?></label></p>
+                      <p><label for="activist_mode_1"><input type="radio" name="activist_cache_mode" id="activist_mode_1" value="1" <?php checked('1', $cache_mode); ?> /> <?php esc_html_e('Make error pages available offline.', 'activist'); ?></label></p>
+                      <p><label for="activist_mode_2"><input type="radio" name="activist_cache_mode" id="activist_mode_2" value="2" <?php checked('2', $cache_mode); ?> /> <?php esc_html_e('Make all pages available offline.', 'activist'); ?></label></p>
                       </fieldset>
       							</td>
                   </tr>
@@ -31,7 +31,7 @@
                   	<td align="left">
                 		  <p>
                 		    <label for="activist_auto_update" title="<?php esc_attr_e( 'Automatically Update' , 'activist'); ?>">
-                        <input name="activist_auto_update" id="activist_auto_update" value="1" type="checkbox" <?php checked('1', get_option('activist_auto_update')); ?>> <?php esc_html_e('Periodically update the activist.js script', 'activist'); ?>
+                        <input name="activist_auto_update" id="activist_auto_update" value="1" type="checkbox" <?php checked('1', get_option('activist_auto_update', 1)); ?>> <?php esc_html_e('Periodically update the activist.js script', 'activist'); ?>
                         </label>
                 			</p>
       							</td>

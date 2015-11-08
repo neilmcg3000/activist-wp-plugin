@@ -58,8 +58,8 @@ class Activist_Admin {
   }
 
   public static function display_page() {
-    $cache_mode = get_option('activist_cache_mode');
-    $auto_update = get_option('activist_auto_update');
+    $cache_mode = get_option('activist_cache_mode', 1);
+    $auto_update = get_option('activist_auto_update', 1);
 
     Activist::view('config', compact('cache_mode', 'auto_update'));
   }
