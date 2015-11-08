@@ -9,17 +9,22 @@
  * Network: false
  * License: Apache 2.0
  */
-defined('ABSPATH') or die('');
-include('includes/functions.php');
 
-add_filter('language_attributes', 'activist_lang_add');
-add_filter('mod_rewrite_rules', 'activist_rule_add');
+// Make sure we don't expose any info if called directly
+if (!function_exists('add_action')) {
+  echo 'Hi there!  I\'m just a plugin, not much I can do when called directly.';
+ 	exit;
+}
 
+define('ACTIVIST__PLUGIN_DIR', plugin_dir_path(__FILE__));
 
-add_action('publish_post', 'activist_regen_manifest');
-add_action('update_post', 'activist_regen_manifest');
+require_once(ACTIVIST__PLUGIN_DIR . 'includes/activist.class.php');
 
-add_action('wp_enqueue_scripts', 'activist_include');
+add_action('init', array('Activist', 'init'));
 
+if (is_admin()) {
+  require_once(ACTIVIST__PLUGIN_DIR . 'includes/activist-admin.class.php');
+ 	add_action('init', array('Activist_Admin', 'init'));
+}
 
 ?>
