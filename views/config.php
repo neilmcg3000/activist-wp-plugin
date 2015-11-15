@@ -22,6 +22,7 @@
                       <fieldset><legend class="screen-reader-text"><span><?php esc_html_e('Activist Cache Mode', 'activist'); ?></span></legend>
                       <p><label for="activist_mode_1"><input type="radio" name="activist_cache_mode" id="activist_mode_1" value="1" <?php checked('1', $cache_mode); ?> /> <?php esc_html_e('Make error pages available offline.', 'activist'); ?></label></p>
                       <p><label for="activist_mode_2"><input type="radio" name="activist_cache_mode" id="activist_mode_2" value="2" <?php checked('2', $cache_mode); ?> /> <?php esc_html_e('Make all pages available offline.', 'activist'); ?></label></p>
+											<!--<p><label for="activist_mode_3"><input type="radio" name="activist_cache_mode" id="activist_mode_3" value="3" <?php checked('3', $cache_mode); ?> /> <?php esc_html_e('Make some pages available offline.', 'activist'); ?></label></p>-->
                       </fieldset>
       							</td>
                   </tr>

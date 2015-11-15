@@ -46,7 +46,7 @@ class Activist {
   }
 
   public static function html_tag($output) {
-      $output .= ' manifest="' . self::MANIFEST_NAME . '"';
+      $output .= ' manifest="' . get_bloginfo('url') . '/' . self::MANIFEST_NAME . '"';
       return $output;
   }
 
