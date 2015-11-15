@@ -55,7 +55,7 @@ class Activist {
   }
 
   public static function include_script() {
-    wp_enqueue_script('activist', ACTIVIST__PLUGIN_DIR . 'activist.js', array(), null);
+    wp_enqueue_script('activist', Activist::toUrl(ACTIVIST__PLUGIN_DIR . 'activist.js'), array(), null);
   }
 
   private static function is_mediatype($file) {
