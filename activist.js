@@ -1,118 +1,14 @@
-(function(){
-
-  var waittime = 1000;
-
-  function progress(xhr, callback){
-    console.log('progress');
-  } 
-
-  function done(xhr, callback){
-    console.log('load');
-    callback(0, xhr);
-  }
-
-  function error(xhr, callback){
-    console.error('error', xhr);
-    callback(1, xhr);
-  }
-
-  function timeout(xhr, callback){
-
-    console.error('timeout');
-    callback(1, xhr);
-  }
+(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+"use strict";var liveness=require("./liveness").getStatus,fetchHandler=require("./serviceworker"),activist={};activist.connect=function(){var e=document.getElementsByTagName("script"),t=e[e.length-1],i=t.src;navigator&&navigator.serviceWorker?navigator.serviceWorker.register(i,{scope:"/*"}).then(function(e){console.log("got worker: "+e),fetchHandler.query(navigator.serviceWorker).then(function(e){liveness(e,activist.render)})},function(e){console.error(e),activist.appCache()}):activist.appCache()},activist.appCache=function(){if(window.applicationCache.status>0)liveness([],activist.render);else{if("complete"!==document.readyState)return window.addEventListener("load",activist.appCache,!0);var e=document.createElement("iframe");e.src=require("./config").frame,e.style.display="none",document.body.appendChild(e)}},activist.serve=function(){console.log("Registering service worker.");var e=require("./config");fetchHandler.register([e.offline,e.url])},activist.render=function(e){console.log("Activist believes your connection is: ",e),"Blocked"===e&&require("./render").render()},"undefined"!=typeof document?activist.connect():activist.serve();
+},{"./config":2,"./liveness":3,"./render":4,"./serviceworker":5}],2:[function(require,module,exports){
+"use strict";if(exports.url="/activist.js",exports.frame="/activist-frame.html",exports.offline="/activist-offline.html",exports.message="Your connection to this site was disrupted by your network. Consider an alternative method of access.",exports.service="https://www.sitestat.us/status.js?l=",exports.style={display:"block",position:"fixed",background:"#d14836",color:"white",fontWeight:"700",textAlign:"center",top:0,left:0,width:"100%",padding:"10px",fontFamily:"sans-serif"},"undefined"!=typeof window&&window.activistcfg)for(var i in window.activistcfg)window.activistcfg.hasOwnProperty(i)&&(exports[i]=window.activistcfg[i]);
+},{}],3:[function(require,module,exports){
+function interpret(e){"use strict";var t=[0,0,0],n=0,s=0;for(n=0;3>n;n+=1){for(s=0;s<results[n].length;s+=1)results[n][s]&&(t[n]+=1);t[n]/results[n].length>.5?t[n]=1:t[n]=0}return console.log("Activist.js Concensus",t),e(t[0]?"Connected":(t[1]||t[2])&&results[0].length>0?"Blocked":results[1].length>1?"Disconnected":"Pending")}function finishDispatch(){"use strict";interpret(function(e){var t;if("Pending"!==e){for(t=0;t<callbacks.length;t+=1)callbacks[t](e);callbacks=[]}})}function cleanup(e){"use strict";var t=pending.indexOf(e);t>-1&&pending.splice(t,1)}function done(e,t,n){"use strict";n(t.responseText)?results[e].push(1):results[e].push(0),cleanup(t),finishDispatch()}function progress(e,t,n){"use strict";n.lengthComputable&&n.loaded>0&&(results[e].push(1),t.abort(),cleanup(t),finishDispatch())}function error(e,t,n){"use strict";cleanup(t),console.warn(n),n.message&&n.message.contains("INVALID")?results[e].push(1):results[e].push(0),finishDispatch()}function timeout(e,t){"use strict";pending.indexOf(t)>-1&&(cleanup(t),results[e].push(0),finishDispatch())}function dispatch(e,t,n){"use strict";var s;n?(s=new XMLHttpRequest,pending.push(s),s.addEventListener("progress",progress.bind({},t,s),!1),s.addEventListener("load",done.bind({},t,s,n),!1),s.addEventListener("error",error.bind({},t,s),!1),s.timeout=waittime,s.ontimeout=timeout.bind({},t,s),s.open("HEAD",e),s.send()):(s=document.createElement("img"),s.addEventListener("load",done.bind({},t,s),!1),s.addEventListener("error",error.bind({},t,s),!1),pending.push(s),s.style.width=s.style.height=0,document&&document.body?document.head.appendChild(s):window.addEventListener("load",function(e){document.head.appendChild(e)}.bind({},s)))}function getStatus(e,t){"use strict";return run&&!callbacks.length?interpret(t):(callbacks.length||(run=!0,results[0]=e,dispatch(require("./config").url+"?rand="+Math.random(),0,function(e){return e.indexOf("This-is-Network-Interference!")>0}),results[1]=[navigator.onLine],dispatch("https://www.google.com/favicon.ico",1,!1),dispatch("https://www.baidu.com/favicon.ico",1,!1),dispatch("https://www.yandex.ru/favicon.ico",1,!1),dispatch("https://www.bbc.co.uk/favicon.ico",1,!1),dispatch("https://www.sfr.fr/favicon.ico",1,!1),dispatch(require("./config").service+window.location.href,2,function(e){return e.indexOf("failed")>-1})),void callbacks.push(t))}var waittime=1e3,run=!1,callbacks=[],pending=[],results={0:[],1:[],2:[]};exports.getStatus=getStatus;
+},{"./config":2}],4:[function(require,module,exports){
+"use strict";exports.render=function(){var e,r=document.createElement("div"),n=require("./config").style;r.innerHTML=require("./config").message;for(e in n)n.hasOwnProperty(e)&&(r.style[e]=n[e]);document.body.appendChild(r)};
+},{"./config":2}],5:[function(require,module,exports){
+function register(e){"use strict";self.addEventListener("install",function(n){n.waitUntil(caches.open().then(function(n){n.addAll(e.map(function(e){return new Request(e,{mode:"no-cors"})})).then(function(){console.log("fallback ready.")})})["catch"](function(){console.warn("Registration of activist.js failed.")}))}),self.addEventListener("message",function(e){e.source.postMessage("ACTIVE!")}),self.addEventListener("fetch",function(n){n.respondWith(caches.match(n.request).then(function(t){return t?t:fetch(n.request).then(function(e){return e})["catch"](function(n){var t=new Request(e[0],{mode:"no-cors"});return caches.match(t).then(function(e){if(e)return e;throw console.warn("Failed to find preloaded fallback on error"),n})})}))})}function query(e){"use strict";return new Promise(function(n,t){e.controller.addEventListener("message",function(e){n(e.data)}),e.controller.postMessage("ping")})}exports.register=register,exports.query=query;
+},{}]},{},[1])
 
 
-
-
-
-  function dispatch(url, callback) {
-    var xhr = new XMLHttpRequest();
-    
-    xhr.addEventListener("progress", progress.bind({}, xhr, callback), false);
-    xhr.addEventListener("load", done.bind({}, xhr, callback), false);
-    xhr.addEventListener("error", error.bind({}, xhr, callback), false);
-    xhr.timeout = waittime;
-    xhr.ontimeout = timeout.bind({}, xhr, callback);
-    console.log('getting URL',url);
-    xhr.open("GET", url);
-    // xhr.setRequestHeader('Cache-Control', 'no-cache');
-    xhr.send();
-  }
-
-  function getScriptUrl(){
-    // find the activist script
-    var s = document.getElementsByTagName('script');
-
-    for (i in s){
-        scr = s[i];
-        console.log('searching for the activist script');
-        if(scr.src.indexOf('aactivist.js')!==-1){
-            console.log(scr);
-            return scr.src;
-        }
-        
-    }
-    
-    return false;
-
-  }
-  
-
-  function checkConnectivity(callback){
-    // see if we can reach an uncached version of the activist script and see if it is actually the script
-    var url = getScriptUrl();
-
-
-    // add random string
-    var r = Math.floor((Math.random() * 100000000) + 1);
-    var url_uncached = url + "?rand="+String(r);
-
-    
-    console.log(url_uncached);
-    dispatch(url_uncached, function(error_uncached, xhr_uncached){
-      if(error_uncached == 0){
-
-        // dispatch a second version with the cached script because we cannot read the JS's content straigt from the DOM
-        dispatch(url, function(error, xhr){
-          // compare the two strings
-          //console.log("uncached" ,xhr_uncached.response);
-          //console.log("cached" ,xhr.response);
-
-          var same = xhr_uncached.response == xhr.response;
-          console.log('scripts are equal: ',same);
-          callback(same);
-
-        });
-
-      }else{
-        callback(false);
-      }
-    });
-  }
-
-  console.log('checking connectivity');
-  checkConnectivity(function(result){
-
-    console.log('result', result);
-
-    if(!result){
-      alert('Activist.js script not found or altered. This could mean that this site was censored and will be gone upon the next reload.')
-    }else{
-      // switch the appcache immediately
-      var appCache = window.applicationCache;
-
-      if (appCache.status == appCache.UPDATEREADY) {
-        appCache.swapCache();  // The fetch was successful, swap in the new cache.
-        window.location.reload();
-      }
-    }
-
-
-      console.log('Site is reachable: ', result);
-  });
-
-
-
-
-})();
+//# sourceMappingURL=bundle.map
