@@ -133,7 +133,15 @@ class Activist {
     if (!$manifest) {
       $manifest = self::regen_manifest();
     }
-    return $manifest;
+    if (is_array($manifest)) {
+      if (strpos($_SERVER["HTTP_USER_AGENT"], "Firefox") > 0) {
+        return $manifest["firefox"];
+      } else {
+        return $manifest["default"];
+      }
+    } else {
+      return $manifest;
+    }
   }
 
   public static function regen_manifest() {
@@ -195,17 +203,38 @@ NETWORK:
     return sprintf($manifest, date('d-m-y H:i:s'), implode("\n", $files));
   }
 
-  private static function get_fallback_url() {
+  /**
+   * Get the URL for the site to 'fall back on' when the server can't be reached.
+   * Determined by the 'activist_offline_behavior' option set in the admin config.
+   *
+   * The appcache specification indicates that path-absolute (starting with /)
+   * urls are rooted at the same directory as the cache manifest. (so that if
+   * i control a subdirectory on the server, I can only set the caching behavio
+   * for that app). Firefox follows this spec; chrome does not. This forces a
+   * useragent detection to determine where the URL is rooted when printed.
+   * This function provides both, and useragent determination happens in the
+   * @see{get_manifest} function.
+   */
+  private static function get_fallback_urls() {
     $fallbackid = get_option('activist_offline_behavior', 0);
     if ($fallbackid > 0) {
-      return str_replace(get_bloginfo('url'), '', get_permalink($fallbackid));
+      return array(
+        "firefox" => str_replace(get_bloginfo('url'), '', get_permalink($fallbackid)),
+        "default" => self::toURL(get_permalink($fallbackid))
+      );
     } else {
-      return "?activistrsrc=offline.html";
+      return array(
+        "firefox" => "?activistrsrc=offline.html",
+        "default" => "?activistrsrc=offline.html"
+      );
     }
   }
 
   private static function construct_manifest_fb($files) {
-    $manifest = "CACHE MANIFEST
+    $fbs = self::get_fallback_urls();
+    $outs = [];
+    foreach($fbs as $browser => $fb) {
+      $manifest = "CACHE MANIFEST
 # %s
 
 CACHE:
@@ -218,10 +247,12 @@ FALLBACK:
 #NETWORK:
 #*
 ";
-    return sprintf($manifest,
-      date('d-m-y H:i:s'),
-      implode("\n", $files),
-      self::get_fallback_url());
+      $outs[$browser] = sprintf($manifest,
+        date('d-m-y H:i:s'),
+        implode("\n", $files),
+        $fb);
+    }
+    return $outs;
   }
 
   public static function view($name, array $args = array()) {
