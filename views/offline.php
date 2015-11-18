@@ -2,9 +2,11 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <script src='<?php echo esc_url($activisturl); ?>'></script>
+    <script src='?activistrsrc=activist.js'></script>
   </head>
   <body>
-    AppCache Invoked.
+    Sorry. This page is currently unvailable because the server cannot be reached.
+    <br />
+    Make sure you are connected to the Internet, and try again.
   </body>
 </html>

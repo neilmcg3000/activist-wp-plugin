@@ -3,6 +3,7 @@
 class Activist {
   const MANIFEST_NAME = 'cache.appcache';
   const MANIFEST_TRANSIENT = 'activist_cachemanifest';
+  const SCRIPT_OPTION_KEY = 'activist_activistjs';
 
   public static $CACHE_MODES = array(
     "Implicit Cache" => 1,
@@ -62,7 +63,8 @@ class Activist {
   }
 
   public static function include_script() {
-    wp_enqueue_script('activist', Activist::toUrl(ACTIVIST__PLUGIN_DIR . 'activist.js'), array(), null);
+    $script = Activist::toUrl(get_bloginfo('url') . '?activistrsrc=activist.js');
+    wp_enqueue_script('activist', $script, array(), null);
   }
 
   public static function rsrc_queries($vars) {
@@ -75,26 +77,52 @@ class Activist {
       $rsrc = get_query_var('activistrsrc');
       if ($rsrc == Activist::MANIFEST_NAME) {
         header('Content-Type: text/cache-manifest');
-        delete_transient(Activist::MANIFEST_TRANSIENT);
+
+        // In debug mode, always regenerate the manifest.
+        if (WP_DEBUG) {
+          delete_transient(Activist::MANIFEST_TRANSIENT);
+        }
+
         echo self::get_manifest();
+      } else if ($rsrc == 'activist.js') {
+        header('Content-Type: text/javascript');
+        echo self::get_script();
       } else if ($rsrc == 'frame.html') {
         self::view('frame');
       } else if ($rsrc == 'offline.html') {
-        $activisturl = Activist::toUrl(ACTIVIST__PLUGIN_DIR . 'activist.js');
-        self::view('offline', compact('activisturl'));
+        self::view('offline');
       }
       exit();
     }
   }
 
   public static function activistcfg() {
-    $url = Activist::toUrl(ACTIVIST__PLUGIN_DIR . 'activist.js');
+    $script = Activist::toUrl(get_bloginfo('url') . '?activistrsrc=activist.js');
     $frame = Activist::toUrl(get_bloginfo('url') . '?activistrsrc=frame.html');
-    echo("<script type='text/javascript'>window.activistcfg={url:'$url',frame:'$frame'};</script>");
+    echo("<script type='text/javascript'>window.activistcfg={url:'$script',frame:'$frame'};</script>");
+  }
+
+  public static function get_script() {
+    $script = get_option(Activist::SCRIPT_OPTION_KEY);
+    if (!$script) {
+      $script = self::load_script();
+    }
+    return $script;
+  }
+
+  private static function load_script() {
+    $data = "";
+    try {
+      $data = file_get_contents(ACTIVIST__PLUGIN_DIR . '/activist.js');
+    } catch (Exception $e) {
+      error_log("[Fatal!] Failed to read packaged resource: " + $e->toMessage());
+    }
+    update_option(Activist::SCRIPT_OPTION_KEY, $data);
+    return $data;
   }
 
   private static function is_mediatype($file) {
-    $types = array("js", "css", "png", "jpg", "jpeg", "gif");
+    $types = array("js", "css", "png", "jpg", "jpeg", "gif", "svg");
     $type = array_pop(explode('.', $file));
 
     return in_array($type, $types);
@@ -111,7 +139,7 @@ class Activist {
   public static function regen_manifest() {
     // collect files to cache
     $files_to_cache = array();
-    $files_to_cache[] = str_replace(ABSPATH, '', ACTIVIST__PLUGIN_DIR . 'activist.js');
+    $files_to_cache[] = "?activistrsrc=activist.js";
 
     // save all posts?
     //TODO: support recent content only.
@@ -148,6 +176,7 @@ class Activist {
     return $manifest;
   }
 
+  // provide an absolute path URL appropriate for the cache manifest file.
   private static function toURL($file) {
     $relativeURL = parse_url(get_bloginfo('url'), PHP_URL_PATH);
     return str_replace('\\', '/', str_replace(ABSPATH, $relativeURL . '/', $file));
