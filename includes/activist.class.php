@@ -123,9 +123,9 @@ class Activist {
 
   private static function is_mediatype($file) {
     $types = array("js", "css", "png", "jpg", "jpeg", "gif", "svg");
-    $type = array_pop(explode('.', $file));
+    $ext = substr($file, strrpos($file, ".") + 1);
 
-    return in_array($type, $types);
+    return in_array($ext, $types);
   }
 
   public static function get_manifest() {
@@ -159,7 +159,7 @@ class Activist {
     $dir = new RecursiveDirectoryIterator($themedir);
     foreach (new RecursiveIteratorIterator($dir) as $file) {
         if ($file->IsFile() && substr($file->getFilename(), 0, 1) != ".") {
-            if(self::is_mediatype($file)) {
+            if(self::is_mediatype($file->getFilename())) {
                 array_push($files_to_cache, str_replace(ABSPATH, '', $file));
             }
         }
@@ -195,6 +195,15 @@ NETWORK:
     return sprintf($manifest, date('d-m-y H:i:s'), implode("\n", $files));
   }
 
+  private static function get_fallback_url() {
+    $fallbackid = get_option('activist_offline_behavior', 0);
+    if ($fallbackid > 0) {
+      return str_replace(get_bloginfo('url'), '', get_permalink($fallbackid));
+    } else {
+      return "?activistrsrc=offline.html";
+    }
+  }
+
   private static function construct_manifest_fb($files) {
     $manifest = "CACHE MANIFEST
 # %s
@@ -203,7 +212,7 @@ CACHE:
 %s
 
 FALLBACK:
-/ ?activistrsrc=offline.html
+/ %s
 
 # Breaks firefox
 #NETWORK:
@@ -211,7 +220,8 @@ FALLBACK:
 ";
     return sprintf($manifest,
       date('d-m-y H:i:s'),
-      implode("\n", $files));
+      implode("\n", $files),
+      self::get_fallback_url());
   }
 
   public static function view($name, array $args = array()) {
