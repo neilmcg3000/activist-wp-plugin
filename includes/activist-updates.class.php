@@ -35,11 +35,11 @@ class Activist_Updates {
   }
 
   public static function check_for_updates() {
-    if ((time() - get_option('activist_update_time') < Activist_Updates::CHECK_INTERVAL)) {
+    if ((time() - get_site_option('activist_update_time') < Activist_Updates::CHECK_INTERVAL)) {
       // no more than once/week.
       return true;
     }
-    update_option('activist_update_time', time());
+    update_site_option('activist_update_time', time());
 
     $response = wp_remote_get(Activist_Updates::REMOTE_RELEASE);
     if (is_array($response) && !is_wp_error($response)) {
@@ -81,8 +81,8 @@ class Activist_Updates {
       }
 
       // Save that we have the new version.
-      update_option(Activist::SCRIPT_OPTION_KEY, $data);
-      update_option('activist_update_version', $version);
+      update_site_option(Activist::SCRIPT_OPTION_KEY, $data);
+      update_site_option('activist_update_version', $version);
     }
   }
 

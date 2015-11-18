@@ -103,7 +103,7 @@ class Activist {
   }
 
   public static function get_script() {
-    $script = get_option(Activist::SCRIPT_OPTION_KEY);
+    $script = get_site_option(Activist::SCRIPT_OPTION_KEY);
     if (!$script) {
       $script = self::load_script();
     }
@@ -117,7 +117,7 @@ class Activist {
     } catch (Exception $e) {
       error_log("[Fatal!] Failed to read packaged resource: " + $e->toMessage());
     }
-    update_option(Activist::SCRIPT_OPTION_KEY, $data);
+    update_site_option(Activist::SCRIPT_OPTION_KEY, $data);
     return $data;
   }
 
@@ -172,7 +172,7 @@ class Activist {
     } else {
       $manifest = self::construct_manifest_fb($files_to_cache);
     }
-    self::write_cache_manifest($manifest);
+    set_transient(Activist::MANIFEST_TRANSIENT, $manifest, 7 * DAY_IN_SECONDS);
     return $manifest;
   }
 
@@ -212,18 +212,6 @@ FALLBACK:
     return sprintf($manifest,
       date('d-m-y H:i:s'),
       implode("\n", $files));
-  }
-
-  private static function write_cache_manifest($data) {
-    set_transient(Activist::MANIFEST_TRANSIENT, $data, 7 * DAY_IN_SECONDS);
-
-    try {
-      $fh = @fopen(ABSPATH . '/' . self::MANIFEST_NAME, 'w');
-      @fwrite($fh, $data);
-      @fclose($fh);
-    } catch (Exception $e) {
-      error_log("Failed to write disk manifest: " + $e->toMessage());
-    }
   }
 
   public static function view($name, array $args = array()) {
