@@ -76,11 +76,12 @@ class Activist_Updates {
         fwrite($fh, $data);
         fclose($fh);
       } catch (Exception $e) {
-        error_log("Failed to appy activist update. File cant be overwritten.");
+        error_log("Failed to appy activist update to disk.");
         return;
       }
 
       // Save that we have the new version.
+      update_option(Activist::SCRIPT_OPTION_KEY, $data);
       update_option('activist_update_version', $version);
     }
   }
