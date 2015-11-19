@@ -86,6 +86,32 @@
 											</p>
 										</td>
 									</tr>
+									<tr>
+										<th align="left" scope="row"><?php esc_html_e('When Censored', 'activist');?></th>
+										<td></td>
+										<td align="left">
+											<p>
+												<fieldset><legend class="screen-reader-text"><span><?php esc_html_e('Activist Censored Behavior', 'activist'); ?></span></legend>
+												<p><label for="activist_censor_warn"><input type="radio" name="activist_censor_behavior" id="activist_censor_warn" value="0" <?php checked('0', $censor_behavior); ?> /> <?php esc_html_e('Show default warning.', 'activist'); ?></label></p>
+												<p><label for="activist_censor_post"><input type="radio" name="activist_censor_behavior" id="activist_censor_post" value="<?php echo $censor_behavior; ?>" <?php if($censor_behavior > 0) {echo("checked='checked'");} ?> />
+													<span style='display:inline-block'>
+													<?php esc_html_e('Show page:', 'activist'); ?>
+													<?php wp_dropdown_pages(array( 'name' => 'activist_censor_chooser', 'show_option_none' => __( '&mdash; Select &mdash;' ), 'option_none_value' => '0', 'selected' => $censor_behavior)); ?>
+													<script type='text/javascript'>
+														var selector = document.getElementById('activist_censor_chooser');
+														selector.addEventListener('change', function() {
+															var specific = document.getElementById('activist_censor_post');
+															specific.checked = 'checked';
+															specific.value = selector.value;
+														}, true);
+													</script>
+												</span>
+												</label>
+												</p>
+												</fieldset>
+											</p>
+										</td>
+									</tr>
                 </tbody>
               </table>
             </div>
