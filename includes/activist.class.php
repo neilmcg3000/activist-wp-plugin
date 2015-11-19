@@ -91,6 +91,8 @@ class Activist {
         self::view('frame');
       } else if ($rsrc == 'offline.html') {
         self::view('offline');
+      } else if ($rsrc == 'warning.html') {
+        self::view('warning');
       }
       exit();
     }
@@ -99,7 +101,16 @@ class Activist {
   public static function activistcfg() {
     $script = Activist::toUrl(get_bloginfo('url') . '?activistrsrc=activist.js');
     $frame = Activist::toUrl(get_bloginfo('url') . '?activistrsrc=frame.html');
-    echo("<script type='text/javascript'>window.activistcfg={url:'$script',frame:'$frame'};</script>");
+    $offline = self::get_fallback_urls()["default"];
+    $censor = self::get_censor_urls()["default"];
+    echo("<script type='text/javascript'>");
+    echo("window.activistcfg={
+      url:'$script',
+      frame:'$frame',
+      offline:'$offline',
+      message:'<meta http-equiv=refresh content=\"0; url=$censor\" />'
+    };");
+    echo("</script>");
   }
 
   public static function get_script() {
@@ -191,6 +202,7 @@ class Activist {
   }
 
   private static function construct_manifest_full($files) {
+    $files[] = self::get_censor_urls()["default"];
     $manifest = "CACHE MANIFEST
 # %s
 
@@ -215,23 +227,33 @@ NETWORK:
    * This function provides both, and useragent determination happens in the
    * @see{get_manifest} function.
    */
-  private static function get_fallback_urls() {
-    $fallbackid = get_option('activist_offline_behavior', 0);
-    if ($fallbackid > 0) {
+  private static function get_fallback_urls()
+  {
+    return self::get_urls(get_option('activist_offline_behavior', 0), "offline.html");
+  }
+
+  private static function get_censor_urls()
+  {
+    return self::get_urls(get_option('activist_censor_behavior', 0), "warning.html");
+  }
+
+  private static function get_urls($pageid, $default) {
+    if ($pageid > 0) {
       return array(
-        "firefox" => str_replace(get_bloginfo('url'), '', get_permalink($fallbackid)),
-        "default" => self::toURL(get_permalink($fallbackid))
+        "firefox" => str_replace(get_bloginfo('url'), '', get_permalink($pageid)),
+        "default" => self::toURL(get_permalink($pageid))
       );
     } else {
       return array(
-        "firefox" => "?activistrsrc=offline.html",
-        "default" => "?activistrsrc=offline.html"
+        "firefox" => "?activistrsrc=" . $default,
+        "default" => "?activistrsrc=" . $defualt
       );
     }
   }
 
   private static function construct_manifest_fb($files) {
     $fbs = self::get_fallback_urls();
+    $censors = self::get_censor_urls();
     $outs = [];
     foreach($fbs as $browser => $fb) {
       $manifest = "CACHE MANIFEST
@@ -249,7 +271,7 @@ FALLBACK:
 ";
       $outs[$browser] = sprintf($manifest,
         date('d-m-y H:i:s'),
-        implode("\n", $files),
+        implode("\n", $files) . "\n" . $censors[$browser],
         $fb);
     }
     return $outs;
