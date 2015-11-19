@@ -49,7 +49,7 @@ class Activist_Admin {
     }
 
     if (isset($_POST['activist_offline_behavior'])) {
-      $post = WP_Post::get_instance((int)$_POST['activist_offline_behavior']);
+      $post = get_post((int)$_POST['activist_offline_behavior']);
       if ($post) {
         update_option('activist_offline_behavior', (string)(int)($_POST['activist_offline_behavior']));
       } else {
@@ -60,7 +60,7 @@ class Activist_Admin {
     }
 
     if (isset($_POST['activist_censor_behavior'])) {
-      $post = WP_Post::get_instance((int)$_POST['activist_censor_behavior']);
+      $post = get_post((int)$_POST['activist_censor_behavior']);
       if ($post) {
         update_option('activist_censor_behavior', (string)(int)($_POST['activist_censor_behavior']));
       } else {

@@ -72,11 +72,11 @@
 													<?php esc_html_e('Show page:', 'activist'); ?>
 													<?php wp_dropdown_pages(array( 'name' => 'activist_offline_chooser', 'show_option_none' => __( '&mdash; Select &mdash;' ), 'option_none_value' => '0', 'selected' => $offline_behavior)); ?>
 													<script type='text/javascript'>
-														var selector = document.getElementById('activist_offline_chooser');
-														selector.addEventListener('change', function() {
+														var oselector = document.getElementById('activist_offline_chooser');
+														oselector.addEventListener('change', function() {
 															var specific = document.getElementById('activist_offline_post');
 															specific.checked = 'checked';
-															specific.value = selector.value;
+															specific.value = oselector.value;
 														}, true);
 													</script>
 												</span>
@@ -98,11 +98,11 @@
 													<?php esc_html_e('Show page:', 'activist'); ?>
 													<?php wp_dropdown_pages(array( 'name' => 'activist_censor_chooser', 'show_option_none' => __( '&mdash; Select &mdash;' ), 'option_none_value' => '0', 'selected' => $censor_behavior)); ?>
 													<script type='text/javascript'>
-														var selector = document.getElementById('activist_censor_chooser');
-														selector.addEventListener('change', function() {
+														var cselector = document.getElementById('activist_censor_chooser');
+														cselector.addEventListener('change', function() {
 															var specific = document.getElementById('activist_censor_post');
 															specific.checked = 'checked';
-															specific.value = selector.value;
+															specific.value = cselector.value;
 														}, true);
 													</script>
 												</span>
