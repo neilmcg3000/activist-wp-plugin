@@ -49,17 +49,6 @@
 											</script>
       							</td>
                   </tr>
-                  <tr>
-                    <th align="left" scope="row"><?php esc_html_e('Auto Update', 'activist');?></th>
-          					<td></td>
-                  	<td align="left">
-                		  <p>
-                		    <label for="activist_auto_update" title="<?php esc_attr_e( 'Automatically Update' , 'activist'); ?>">
-                        <input name="activist_auto_update" id="activist_auto_update" value="1" type="checkbox" <?php checked('1', get_option('activist_auto_update', 1)); ?>> <?php esc_html_e('Periodically update the activist.js script', 'activist'); ?>
-                        </label>
-                			</p>
-      							</td>
-                  </tr>
 									<tr>
 										<th align="left" scope="row" id='offline_label'><?php esc_html_e('When Offline', 'activist');?></th>
 										<td></td>

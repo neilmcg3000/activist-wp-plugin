@@ -12,7 +12,6 @@ class Activist {
 
   private static $initiated = false;
   private static $cache_mode = 1;
-  private static $auto_update = true;
 
   public static function init() {
     if (!self::$initiated) {
@@ -41,15 +40,10 @@ class Activist {
     add_action('update_post', array('Activist', 'regen_manifest'));
 
     self::$cache_mode = apply_filters('activist_cache_mode', get_option('activist_cache_mode', 1));
-    self::$auto_update = apply_filters('activist_auto_update', get_option('activist_auto_update', 1));
 
     // Normal pages are only added in primary cache mode.
     if (self::$cache_mode == self::$CACHE_MODES['All Posts']) {
       add_filter('language_attributes', array('Activist', 'html_tag'));
-    }
-    if (self::$auto_update) {
-      require_once(ACTIVIST__PLUGIN_DIR . 'includes/activist-updates.class.php');
-      Activist_Updates::init();
     }
   }
 
