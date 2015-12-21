@@ -2,8 +2,8 @@
 Contributors: willscott
 Tags: access, caching, block, censorship
 Requires at least: 4.0
-Tested up to: 4.3.1
-Stable tag: 4.3
+Tested up to: 4.4
+Stable tag: 4.4
 License: BSD
 License URI: https://opensource.org/licenses/BSD-3-Clause
 
@@ -15,7 +15,7 @@ Activist adds fallback application-cache caching to your site, so that visitors 
 
 == Installation ==
 
-1. Upload The `activist-wp-plugin` folder to the `/wp-content/plugins/` directory
+1. Upload The `activist` folder to the `/wp-content/plugins/` directory
 1. Activate the plugin through the 'Plugins' menu in WordPress
 1. Configure behavior in the settings menu.
 
@@ -34,5 +34,9 @@ from their ISP, and allows configuration of a custom message in those cases.
 
 == Changelog ==
 
+= 0.1.1 =
+* Update to wordpress 4.4
+* Add assets
+* Bug fixes
 = 0.1.0 =
 * Initial Listing
