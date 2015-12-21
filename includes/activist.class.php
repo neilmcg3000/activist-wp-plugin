@@ -28,6 +28,7 @@ class Activist {
     // add hooks to make browsers recognize the cache
     add_filter('mod_rewrite_rules', array('Activist', 'mime_type'));
     add_action('wp_enqueue_scripts', array('Activist', 'include_script'));
+    add_filter('script_loader_tag', array('Activist', 'defer_script'))
     add_action('wp_head', array('Activist', 'activistcfg'));
 
     // allow serving the cache / frame rsrcs from index (@ wordpress rood dir)
@@ -58,7 +59,15 @@ class Activist {
 
   public static function include_script() {
     $script = Activist::toUrl(get_bloginfo('url') . '?activistrsrc=activist.js');
-    wp_enqueue_script('activist', $script, array(), null);
+    wp_enqueue_script('activist', $script, array(), null, true);
+  }
+
+  // add the async attribute to the activist script.
+  public static function defer_script($tag, $handle) {
+    if ($handle !== 'activist') {
+      return $tag;
+    }
+    return str_replace(' src', 'async="async" src', $tag);
   }
 
   public static function rsrc_queries($vars) {
@@ -240,7 +249,7 @@ NETWORK:
     } else {
       return array(
         "firefox" => "?activistrsrc=" . $default,
-        "default" => "?activistrsrc=" . $defualt
+        "default" => "?activistrsrc=" . $default
       );
     }
   }
