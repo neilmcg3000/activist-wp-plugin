@@ -28,7 +28,7 @@ class Activist {
     // add hooks to make browsers recognize the cache
     add_filter('mod_rewrite_rules', array('Activist', 'mime_type'));
     add_action('wp_enqueue_scripts', array('Activist', 'include_script'));
-    add_filter('script_loader_tag', array('Activist', 'defer_script'))
+    add_filter('script_loader_tag', array('Activist', 'defer_script'));
     add_action('wp_head', array('Activist', 'activistcfg'));
 
     // allow serving the cache / frame rsrcs from index (@ wordpress rood dir)
