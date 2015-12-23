@@ -4,6 +4,7 @@ class Activist {
   const MANIFEST_NAME = 'cache.appcache';
   const MANIFEST_TRANSIENT = 'activist_cachemanifest';
   const SCRIPT_OPTION_KEY = 'activist_activistjs';
+  const SCRIPT_OPTION_HASH_KEY = 'activist_activistjs_sha512';
 
   public static $CACHE_MODES = array(
     "Implicit Cache" => 1,
@@ -28,7 +29,7 @@ class Activist {
     // add hooks to make browsers recognize the cache
     add_filter('mod_rewrite_rules', array('Activist', 'mime_type'));
     add_action('wp_enqueue_scripts', array('Activist', 'include_script'));
-    add_filter('script_loader_tag', array('Activist', 'defer_script'));
+    add_filter('script_loader_tag', array('Activist', 'defer_script'), 10, 2);
     add_action('wp_head', array('Activist', 'activistcfg'));
 
     // allow serving the cache / frame rsrcs from index (@ wordpress rood dir)
@@ -62,12 +63,13 @@ class Activist {
     wp_enqueue_script('activist', $script, array(), null, true);
   }
 
-  // add the async attribute to the activist script.
+  // add attributes to the activist script.
   public static function defer_script($tag, $handle) {
-    if ($handle !== 'activist') {
+    if ('activist' !== $handle) {
       return $tag;
     }
-    return str_replace(' src', 'async="async" src', $tag);
+    $integrity = self::get_script_digest();
+    return str_replace('<script', '<script async="async" integrity="' . $integrity . '"', $tag);
   }
 
   public static function rsrc_queries($vars) {
@@ -124,6 +126,15 @@ class Activist {
     return $script;
   }
 
+  public static function get_script_digest() {
+    $digest = get_site_option(Activist::SCRIPT_OPTION_HASH_KEY);
+    if (!$digest) {
+      self::load_script();
+      $digest = get_site_option(Activist::SCRIPT_OPTION_HASH_KEY);
+    }
+    return $digest;
+  }
+
   private static function load_script() {
     $data = "";
     try {
@@ -131,7 +142,10 @@ class Activist {
     } catch (Exception $e) {
       error_log("[Fatal!] Failed to read packaged resource: " + $e->toMessage());
     }
+
+    $hash = base64_encode(hash("sha512", $data, true));
     update_site_option(Activist::SCRIPT_OPTION_KEY, $data);
+    update_site_option(Activist::SCRIPT_OPTION_HASH_KEY, "sha512-" . $hash);
     return $data;
   }
 
